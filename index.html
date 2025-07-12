@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini chat WebSocket</title>
+</head>
+
+<body>
+  <h1>Mini chat WebSocket</h1>
+  <input type="text" id="msg" placeholder="Tape ton message..." />
+  <button id="sendBtn">Envoyer</button>
+  <ul id="chat"></ul>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:3000');
+
+    const chat = document.getElementById('chat');
+    const sendBtn = document.getElementById('sendBtn');
+    const input = document.getElementById('msg');
+
+    // se déclenche a l'ouverture de la connexion
+    socket.addEventListener('open', () => {
+      console.log("✅ Connecté au serveur WebSocket");
+    });
+
+    // message est reçu du serveur
+    socket.addEventListener('message', (event) => {
+      const li = document.createElement('li');
+      li.textContent = event.data;
+      chat.appendChild(li);
+    });
+
+    // envoie de message par click sur 'Envoyer'
+    sendBtn.addEventListener('click', () => {
+      const message = input.value.trim();
+      if (message) {
+        socket.send(message);
+        input.value = '';
+      }
+    });
+
+    // envoie de message en appuyant sur Entrée
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        sendBtn.click(); //simule le click sur 'Envoyer'
+      }
+    });
+
+    // En cas d'erreur
+    socket.addEventListener('error', (event) => {
+      console.error('🚨 Erreur WebSocket :', event);
+    });
+
+    // Quand la connexion se ferme
+    socket.addEventListener('close', () => {
+      console.log('🔌 Connexion WebSocket fermée');
+    });
+  </script>
+</body>
+
+</html>
